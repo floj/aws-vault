@@ -41,7 +41,7 @@ aws-vault-darwin-amd64.dmg: aws-vault-darwin-amd64
 	./bin/create-dmg aws-vault-darwin-amd64 $@
 
 aws-vault-android-arm64: $(SRC)
-	GOOS=android GOARCH=arm64 go build $(BUILD_FLAGS) -o $@ .
+	GOOS=linux GOARCH=arm64 go build -tags='androiddnsfix' $(BUILD_FLAGS) -o $@ .
 
 SHA256SUMS: binaries aws-vault-darwin-amd64.dmg
 	shasum -a 256 aws-vault-android-arm64 aws-vault-freebsd-amd64 aws-vault-linux-amd64 aws-vault-linux-arm64 aws-vault-windows-386.exe aws-vault-darwin-amd64.dmg > $@
