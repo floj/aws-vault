@@ -324,7 +324,7 @@ func (cl *ConfigLoader) populateFromConfigFile(config *Config, profileName strin
 	}
 
 	if psection.ParentProfile != "" {
-		fmt.Fprint(os.Stderr, "Warning: parent_profile is deprecated, please use include_profile instead in your AWS config")
+		fmt.Fprint(os.Stderr, "Warning: parent_profile is deprecated, please use include_profile instead in your AWS config\n")
 	}
 
 	if psection.IncludeProfile != "" {
@@ -542,6 +542,10 @@ func (c *Config) CanUseGetSessionToken() (bool, string) {
 	} else if c.IsChained() {
 		if !c.ChainedFromProfile.HasMfaSerial() {
 			return false, fmt.Sprintf("profile '%s' has no MFA serial defined", c.ChainedFromProfile.ProfileName)
+		}
+
+		if !c.HasMfaSerial() && c.ChainedFromProfile.HasMfaSerial() {
+			return false, fmt.Sprintf("profile '%s' has no MFA serial defined", c.ProfileName)
 		}
 
 		if c.ChainedFromProfile.MfaSerial != c.MfaSerial {
