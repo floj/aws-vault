@@ -1,9 +1,9 @@
 #!/bin/sh
 # Adds a Yubikey TOTP device to IAM
 
-set -e
+set -eu
 
-if [ -n "$AWS_SESSION_TOKEN" ]; then
+if [ -n "${AWS_SESSION_TOKEN:-}" ]; then
   echo "aws-vault must be run without a STS session, please run it with the --no-session flag" >&2
   exit 1
 fi
@@ -17,7 +17,9 @@ cleanup()
 trap cleanup EXIT
 
 ACCOUNT_ARN=$(aws sts get-caller-identity --query Arn --output text)
-USERNAME=$(echo "$ACCOUNT_ARN" | cut -d/ -f2)
+# Assume that the final portion of the ARN is the username
+# Works for ARNs like `users/<user>` and `users/engineers/<user>`
+USERNAME=$(echo "$ACCOUNT_ARN" | rev | cut -d/ -f1 | rev)
 
 OUTFILE=$(mktemp)
 SERIAL_NUMBER=$(aws iam create-virtual-mfa-device \
